@@ -1,0 +1,1316 @@
+{
+  "info": {
+    "name": "AutoFix Garage API",
+    "description": "Postman tests for AutoFix Garage (BDF, Group ST-CSEQE2B-G09). Set environment baseUrl first.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1 Mechanics",
+      "item": [
+        {
+          "name": "Get all mechanics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Body is an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics"
+              ]
+            },
+            "description": "Expected: 200 + array of mechanics"
+          }
+        },
+        {
+          "name": "Add a mechanic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"mechanicId\", pm.response.json().id);",
+                  "pm.test(\"Has name\", () => pm.expect(pm.response.json().name).to.eql(\"Ravi\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ravi\",\n  \"speciality\": \"Engine\"\n}"
+            },
+            "description": "Expected: 201 + created mechanic"
+          }
+        },
+        {
+          "name": "Get one mechanic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Correct id\", () => pm.expect(pm.response.json().id).to.eql(Number(pm.collectionVariables.get(\"mechanicId\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics/{{mechanicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics",
+                "{{mechanicId}}"
+              ]
+            },
+            "description": "Expected: 200 + one mechanic"
+          }
+        },
+        {
+          "name": "Update a mechanic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Name updated\", () => pm.expect(pm.response.json().name).to.eql(\"Ravi Kumar\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics/{{mechanicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics",
+                "{{mechanicId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ravi Kumar\",\n  \"speciality\": \"Brakes\"\n}"
+            },
+            "description": "Expected: 200 + updated mechanic"
+          }
+        },
+        {
+          "name": "Add mechanic - invalid (no name) [400]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Error message is 'name is required'\", () => pm.expect(pm.response.json().error).to.eql(\"name is required\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"speciality\": \"Engine\"\n}"
+            },
+            "description": "Expected: 400 name is required"
+          }
+        },
+        {
+          "name": "Get mechanic - not found [404]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics",
+                "99999"
+              ]
+            },
+            "description": "Expected: 404 Mechanic not found"
+          }
+        },
+        {
+          "name": "Delete a mechanic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics/{{mechanicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics",
+                "{{mechanicId}}"
+              ]
+            },
+            "description": "Expected: 200 Mechanic deleted"
+          }
+        },
+        {
+          "name": "Delete mechanic again - not found [404]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics/{{mechanicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics",
+                "{{mechanicId}}"
+              ]
+            },
+            "description": "Expected: 404 Mechanic not found"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 Bays",
+      "item": [
+        {
+          "name": "Get all bays",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays"
+              ]
+            },
+            "description": "Expected: 200 + array of bays"
+          }
+        },
+        {
+          "name": "Add a bay",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"bayId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bay 1\",\n  \"vehicle\": \"Car\"\n}"
+            },
+            "description": "Expected: 201 + created bay"
+          }
+        },
+        {
+          "name": "Get one bay",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays/{{bayId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays",
+                "{{bayId}}"
+              ]
+            },
+            "description": "Expected: 200 + one bay"
+          }
+        },
+        {
+          "name": "Update a bay",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Vehicle updated\", () => pm.expect(pm.response.json().vehicle).to.eql(\"Truck\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays/{{bayId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays",
+                "{{bayId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bay 1A\",\n  \"vehicle\": \"Truck\"\n}"
+            },
+            "description": "Expected: 200 + updated bay"
+          }
+        },
+        {
+          "name": "Search bays by vehicle",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"All results match vehicle\", () => { const r = pm.response.json(); pm.expect(r.length).to.be.above(0); r.forEach(b => pm.expect(b.vehicle).to.include(\"Truck\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays?vehicle=Truck",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays"
+              ],
+              "query": [
+                {
+                  "key": "vehicle",
+                  "value": "Truck"
+                }
+              ]
+            },
+            "description": "Expected: 200 + only bays with vehicle containing Truck"
+          }
+        },
+        {
+          "name": "Add bay - invalid (no vehicle) [400]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Error message is 'vehicle is required'\", () => pm.expect(pm.response.json().error).to.eql(\"vehicle is required\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bay X\"\n}"
+            },
+            "description": "Expected: 400 vehicle is required"
+          }
+        },
+        {
+          "name": "Get bay - not found [404]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays",
+                "99999"
+              ]
+            },
+            "description": "Expected: 404 Bay not found"
+          }
+        },
+        {
+          "name": "Delete a bay",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays/{{bayId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays",
+                "{{bayId}}"
+              ]
+            },
+            "description": "Expected: 200 Bay deleted"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 Assignments",
+      "item": [
+        {
+          "name": "Setup: create mechanic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"asnMechanicId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Meena\",\n  \"speciality\": \"General\"\n}"
+            },
+            "description": "Expected: 201"
+          }
+        },
+        {
+          "name": "Setup: create bay",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"asnBayId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bay 7\",\n  \"vehicle\": \"Car\"\n}"
+            },
+            "description": "Expected: 201"
+          }
+        },
+        {
+          "name": "Create assignment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"assignmentId\", pm.response.json().id);",
+                  "pm.test(\"Status is active\", () => pm.expect(pm.response.json().status).to.eql(\"active\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mechanic_id\": {{asnMechanicId}},\n  \"bay_id\": {{asnBayId}},\n  \"vehicle\": \"Swift KA01\"\n}"
+            },
+            "description": "Expected: 201 + assignment"
+          }
+        },
+        {
+          "name": "Get all assignments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments"
+              ]
+            },
+            "description": "Expected: 200 + array"
+          }
+        },
+        {
+          "name": "Get one assignment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/{{assignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments",
+                "{{assignmentId}}"
+              ]
+            },
+            "description": "Expected: 200 + one assignment"
+          }
+        },
+        {
+          "name": "Update assignment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/{{assignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments",
+                "{{assignmentId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicle\": \"Swift KA01 (updated)\"\n}"
+            },
+            "description": "Expected: 200 + updated"
+          }
+        },
+        {
+          "name": "Return assignment (status=returned)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Status is returned\", () => pm.expect(pm.response.json().status).to.eql(\"returned\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/{{assignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments",
+                "{{assignmentId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"returned\"\n}"
+            },
+            "description": "Expected: 200 + status returned"
+          }
+        },
+        {
+          "name": "Create assignment - invalid [400]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicle\": \"X\"\n}"
+            },
+            "description": "Expected: 400"
+          }
+        },
+        {
+          "name": "Get assignment - not found [404]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments",
+                "99999"
+              ]
+            },
+            "description": "Expected: 404"
+          }
+        },
+        {
+          "name": "Delete assignment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/{{assignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments",
+                "{{assignmentId}}"
+              ]
+            },
+            "description": "Expected: 200"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 JOIN",
+      "item": [
+        {
+          "name": "JOIN: assignments with mechanic and bay name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Rows have mechanic_name and bay_name\", () => { const r = pm.response.json(); pm.expect(r.length).to.be.above(0); pm.expect(r[0]).to.have.property(\"mechanic_name\"); pm.expect(r[0]).to.have.property(\"bay_name\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments",
+                "details"
+              ]
+            },
+            "description": "Expected: 200 + rows with mechanic_name, bay_name"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 Twist - Three at a time",
+      "item": [
+        {
+          "name": "Setup: create mechanic Asha",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"ashaId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Asha\",\n  \"speciality\": \"General\"\n}"
+            },
+            "description": "Expected: 201"
+          }
+        },
+        {
+          "name": "Setup: create bay",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"twistBayId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bays",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bays"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Twist Bay\",\n  \"vehicle\": \"Car\"\n}"
+            },
+            "description": "Expected: 201"
+          }
+        },
+        {
+          "name": "Test 1a: Assignment 1 for Asha [201]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"a1\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mechanic_id\": {{ashaId}},\n  \"bay_id\": {{twistBayId}},\n  \"vehicle\": \"Vehicle 1\"\n}"
+            },
+            "description": "Expected: 201"
+          }
+        },
+        {
+          "name": "Test 1b: Assignment 2 for Asha [201]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"a2\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mechanic_id\": {{ashaId}},\n  \"bay_id\": {{twistBayId}},\n  \"vehicle\": \"Vehicle 2\"\n}"
+            },
+            "description": "Expected: 201"
+          }
+        },
+        {
+          "name": "Test 1c: Assignment 3 for Asha [201]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"a3\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mechanic_id\": {{ashaId}},\n  \"bay_id\": {{twistBayId}},\n  \"vehicle\": \"Vehicle 3\"\n}"
+            },
+            "description": "Expected: 201"
+          }
+        },
+        {
+          "name": "Test 2: 4th assignment for Asha [409]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Error message is 'Limit of 3 reached'\", () => pm.expect(pm.response.json().error).to.eql(\"Limit of 3 reached\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mechanic_id\": {{ashaId}},\n  \"bay_id\": {{twistBayId}},\n  \"vehicle\": \"Vehicle 4\"\n}"
+            },
+            "description": "Expected: 409 Limit of 3 reached"
+          }
+        },
+        {
+          "name": "Test 3a: Return one assignment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/{{a1}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments",
+                "{{a1}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"returned\"\n}"
+            },
+            "description": "Expected: 200 status returned"
+          }
+        },
+        {
+          "name": "Test 3b: New assignment for Asha [201]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mechanic_id\": {{ashaId}},\n  \"bay_id\": {{twistBayId}},\n  \"vehicle\": \"Vehicle 5\"\n}"
+            },
+            "description": "Expected: 201 (a place was freed)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 Error handling",
+      "item": [
+        {
+          "name": "Invalid JSON body [400]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mechanics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mechanics"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": "
+            },
+            "description": "Malformed JSON -> 400. A real 500 cannot be triggered safely from Postman; explain it in the report."
+          }
+        }
+      ]
+    }
+  ]
+}
